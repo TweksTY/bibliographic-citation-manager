@@ -1,16 +1,21 @@
+import os
+
 import streamlit as st
 import requests
+from dotenv import load_dotenv
 from utils.citation_types import Book, Dissertation, Article, Proceeding, Author
 
-# Mapping of work types to their corresponding classes
-work_classes = {
+load_dotenv()
+
+# Map literal publication types to their corresponding classes
+INTERNAL_CLASSES_MAP = {
     "Книга": Book,
     "Дисертація": Dissertation,
     "Стаття у журналі": Article,
     "Тези конференції": Proceeding,
 }
 
-# Map your internal work types to Crossref work types
+# Map internal work types to Crossref work types
 CROSSREF_TYPE_MAP = {
     "Книга": "book,type:monograph",
     "Стаття у журналі": "journal-article",
@@ -23,7 +28,7 @@ def get_crossref_metadata(title, work_type, last_name):
     filters = f"type:{crossref_type}" if crossref_type else ""
     params = {
         "rows": 5,
-        "mailto": "tweksty@gmail.com",
+        "mailto": os.getenv("CROSSREF_MAILTO", "your-email@example.com"),
         "filter": filters
     }
     if (last_name):
@@ -32,42 +37,38 @@ def get_crossref_metadata(title, work_type, last_name):
         params["query.title"] = title
     url = f"https://api.crossref.org/works"
     response = requests.get(url, params=params)
-    print(f"Request URL: {response.url}")  # Debugging line to check the request URL
     if response.status_code == 200:
         items = response.json().get("message", {}).get("items", [])
         if items:
             return items
     return None
 
-# Метод для отримання об'єктів авторів з відповіді АРІ
-# Вхідні дані - список авторів з Crossref
-# Повертає список об'єктів Author
 def extract_authors(crossref_authors):
     authors = []
     for author in crossref_authors:
         given = author.get("given", "")
         given = given.rstrip('.')
         family = author.get("family", "")
-        # Якщо дані про автора відсутні, пропускаємо
+
         if not given and not family:
             continue
-        # Розділяємо ім'я та по батькові за пробілом
+
         given_split = given.split() 
-        # Якщо розділення не дало результатів, спробуємо розділити за крапкою
+
         if len(given_split) < 2:
             given_split = given.split(".")
         first = ""
         middle = ""
-        # Якщо є більше одного елемента, перший - ім'я, другий - по батькові
+
         if len(given_split) > 1:
             first = given_split[0]
             middle = given_split[1]
-        # Якщо є тільки одне слово, вважаємо його ім'ям
+
         else:
             first = given
             middle = ""
         last = family
-        # Видаляємо крапки в кінці імені, по батькові та прізвища
+
         first = first.rstrip(".")
         middle = middle.rstrip(".")
         last = last.rstrip(".")
@@ -157,7 +158,7 @@ if st.session_state.get('switch_page', False):
 if st.button(":arrow_left: Повернутися на попередню сторінку"):
     st.switch_page("index.py")
 
-work_type = st.selectbox("Тип джерела", list(work_classes.keys()))
+work_type = st.selectbox("Тип джерела", list(INTERNAL_CLASSES_MAP.keys()))
 
 with st.form("search_form"):
     title_input = st.text_input("Назва")
@@ -177,7 +178,7 @@ if submitted and (title_input or last_name):
             col1, col2 = st.columns([9,3])
             for idx, crossref_item in enumerate(crossref_items):
                 metadata = get_metadata_by_type(work_type, crossref_item)
-                work_obj = work_classes[work_type](metadata)
+                work_obj = INTERNAL_CLASSES_MAP[work_type](metadata)
                 works.append(work_obj)
                 with col1:
                     with st.container(height=70, border=True):

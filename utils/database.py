@@ -179,7 +179,7 @@ def update_entry(conn, entry):
                           year = ?,
                           publisher = ?
                       WHERE id = ? '''
-        # Execute the update query
+
         cur.execute(sql, (entry.get_data()+ (entry_id,)))
         conn.commit()
     finally:
@@ -242,7 +242,6 @@ def update_author(conn, author):
             (author.first_name, author.last_name, author.middle_name, author.middle_name)
         )
         row = cur.fetchone()
-        print(row)
         if row:
             return "Автор з таким ім'ям вже існує."
         cur.execute(
@@ -313,11 +312,10 @@ def delete_entry(conn, entry_id):
         cur.close()
 
 def get_entries(conn, entry_type = None, sort_by = "time"):
-    print(sort_by)
     sql_sort_dict = {
         'time_temp' : '',
-        'time' : ' ORDER BY julianday(incl_date) ASC', # Сортування за датою включення
-        'title': ' ORDER BY title ASC', # Сортування за назвою
+        'time' : ' ORDER BY julianday(incl_date) ASC',
+        'title': ' ORDER BY title ASC',
     }
     sql_sort_str = sql_sort_dict.get(sort_by, '')
     cur = conn.cursor()

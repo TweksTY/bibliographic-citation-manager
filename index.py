@@ -33,7 +33,7 @@ st.set_page_config(page_title="Цитування", page_icon=":book:", layout="
 st.session_state.entry = None
 st.session_state.is_first_load = True
 CONTAINER_HEIGHT = 100
-st.title("Біблографічні посилання")
+st.title("Бібліографічні посилання")
 message_placeholder = st.empty()
 if st.session_state.get('index_message'):
     message_placeholder.success(st.session_state['index_message'])
@@ -103,7 +103,7 @@ for entry in citations:
 
 
 st.download_button(
-    "Завнтажити список",
+    "Завантажити список",
     data=create_list_from_entries([c[1] for c in citations],),
     file_name="citations.txt",
     mime="text/plain",

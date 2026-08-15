@@ -201,11 +201,13 @@ class Entry:
         
 
 class Book(Entry):
+    type = "Book"
     publisher = None
     publishing_number = None
     publishing_type = None
     def __init__(self, data):
         super().__init__(data)
+        self.type = "Book"
         self.publisher = data.get("publisher", self.publisher)
         self.publishing_number = data.get("publishing_number", self.publishing_number)
         self.publishing_type = data.get("publishing_type", self.publishing_type)
@@ -323,6 +325,7 @@ class Book(Entry):
         return super().get_data_with_authors() + (self.publisher, self.publishing_number, self.publishing_type,)
     
 class Dissertation(Entry):
+    type = "Dissertation"
     dissertation_type = None
     university = None
     degree = None
@@ -331,6 +334,7 @@ class Dissertation(Entry):
     db_name = None
     def __init__(self, data):
         super().__init__(data)
+        self.type = "Dissertation"
         self.db_name = data.get("db_name", self.db_name)
         self.dissertation_type = data.get("dissertation_type", self.dissertation_type)
         self.university = data.get("university", self.university)
@@ -373,7 +377,6 @@ class Dissertation(Entry):
         result += f". — {self.city}, {self.year}. — {self.pages_count} {super()._get_translated_text('pages')}."
         result += super()._get_url_text('DSTU_2006')
         return result
-        #return f"{self.authors[0].last_name} {self.authors[0].first_name[0]}. {self.authors[0].middle_name[0]}. {self.title} : ди{super()._get_translated_text('pages')} ... {self.get_degree_text()} : {self.specialty_code} / {self.authors[0].last_name} {self.authors[0].first_name} {self.authors[0].middle_name}. — {self.city}, {self.year}. — {self.pages_count} {super()._get_translated_text('pages')}"
     
     def get_DSTU2015_citation(self):
         name = super()._get_authors_text('DSTU_2015')
@@ -421,12 +424,14 @@ class Dissertation(Entry):
         return result
 
 class Article(Entry):
+    type = "Article"
     journal = None
     issue = None
     number = None
     pages_cited = None
     def __init__(self, data):
         super().__init__(data)
+        self.type = "Article"
         self.journal = data.get("journal", self.journal)
         self.issue = data.get("issue", self.issue)
         self.number = data.get("number", self.number)
@@ -510,6 +515,7 @@ class Article(Entry):
         return result
 
 class Proceeding(Entry):
+    type = "Proceeding"
     conference = None
     publishing_type = None
     conference_date = None
@@ -519,6 +525,7 @@ class Proceeding(Entry):
 
     def __init__(self, data):
         super().__init__(data)
+        self.type = "Proceeding"
         self.publishing_type = data.get("publishing_type", self.publishing_type)
         self.conference_date = data.get("conference_date", self.conference_date)
         self.conference_city = data.get("conference_city", self.conference_city)

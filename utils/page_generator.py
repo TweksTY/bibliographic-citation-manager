@@ -29,8 +29,6 @@ class PageGenerator:
             st.session_state.is_first_load = False
         self.entry = entry
 
-        print("PageGenerator initialized with entry:", entry)
-
     def __validate_author(self, author):
         if len(author.first_name) < 1 or len(author.last_name) < 1:
             return False, "Автор має містити ім'я та прізвище"
